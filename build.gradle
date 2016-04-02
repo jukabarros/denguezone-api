@@ -10,7 +10,7 @@ targetCompatibility = 1.8
 
 // Identificação do war
 war {
-    baseName = 'restServer'
+    baseName = 'denguezone-api'
 }
 
 // Declaração de onde as dependências serão baixadas
