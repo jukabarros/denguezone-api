@@ -51,6 +51,9 @@ dependencies {
 	
 	// JSON
 	compile 'org.json:json:20151123'
+	
+	// MySQL
+	compile 'mysql:mysql-connector-java:5.1.13'
     
 }
 
