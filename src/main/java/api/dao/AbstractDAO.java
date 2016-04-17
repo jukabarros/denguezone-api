@@ -30,11 +30,13 @@ public abstract class AbstractDAO {
 	public void beforeExecuteQuery() throws SQLException{
 		if (this.connDB == null || this.connDB.isClosed()){
 			this.connDB = new DBConnect().connectMysql();
+			this.connDB.setAutoCommit(false);
 		}
 	}
 	
 	public void afterExecuteQuery() throws SQLException{
 		this.queryExec.close();
+		this.connDB.commit();
 		this.connDB.close();
 	}
 
