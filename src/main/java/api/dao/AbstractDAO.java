@@ -17,10 +17,16 @@ public abstract class AbstractDAO {
 	protected String query;
 	protected PreparedStatement queryExec;
 	
+	protected PreparedStatement queryExecInsert;
+	protected String queryInsert;
+	
 	public AbstractDAO() {
 		this.connDB = null;
 		this.query = null;
 		this.queryExec = null;
+		
+		this.queryExecInsert = null;
+		this.queryInsert = null;
 	}
 
 	/*
@@ -38,6 +44,10 @@ public abstract class AbstractDAO {
 		this.queryExec.close();
 		this.connDB.commit();
 		this.connDB.close();
+	}
+	
+	public void closeInsertQuery() throws SQLException {
+		this.queryExecInsert.close();
 	}
 
 }

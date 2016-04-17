@@ -16,7 +16,7 @@ public class ImportDataMain {
 			break;
 		default:
 			csvFile = "/home/juccelino.barros/Desktop/UFRPE/Mestrado/"
-					+ "ProgramacaoAplicada/projeto/casos-doencas/casos-zika2015.csv";
+					+ "ProgramacaoAplicada/projeto/casos-doencas/casos-chikungunya2015.csv";
 			break;
 		}
 		

@@ -64,16 +64,25 @@ public class ReadCSVFile {
 							columnPositionCSV.put(firstLineColumnCSV, i);
 						}
 					}
+					System.out.println("** Colunas: "+columnPositionCSV);
 				}else{
 					List<String> allValuesByLine = this.removeMarkRegister(lineValues);
 					CasosAedesStrings ca = this.mountObjectCasosAedesStr(allValuesByLine, columnPositionCSV);
 					this.dao.insertCasosAedesTemp(ca);
 				}
+				
+				if (lineNumber%2000 == 0){
+					System.out.println("** Registro Inseridos: "+lineNumber);
+				}
 
 			}
+			
+			this.dao.closeInsertQuery();
 			this.dao.afterExecuteQuery();
+
 			long endTime = System.currentTimeMillis();
 			this.calcTimeExecution(startTime, endTime);
+			
 		}catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -90,7 +99,7 @@ public class ReadCSVFile {
 			}
 		}
 		
-		System.out.println("\n\n*** Número de Registro: "+(lineNumber-1));
+		System.out.println("\n\n*** Total Registro: "+(lineNumber-1));
 		System.out.println("*** Fim :)");
 	}
 	
@@ -145,32 +154,32 @@ public class ReadCSVFile {
 		CasosAedesStrings castr = new CasosAedesStrings();
 		try {
 			for (int i = 0; i < lineOfCsv.size(); i++) {
-				castr.setNuNotificacao(lineOfCsv.get(columnIndex.get("nu_notificacao")));
-				castr.setTpNotificacao(lineOfCsv.get(columnIndex.get("tp_notificacao")));
-				castr.setCoCid(lineOfCsv.get(columnIndex.get("co_cid")));
-				castr.setDtNotificacao(lineOfCsv.get(columnIndex.get("dt_notificacao")));
-				castr.setDsSemanaNotificao(lineOfCsv.get(columnIndex.get("ds_semana_notificacao")));
-				castr.setAnoNotificacao(lineOfCsv.get(columnIndex.get("ano_notificacao")));
-				castr.setDtDiagnosticoSintoma(lineOfCsv.get(columnIndex.get("dt_diagnostico_sintoma")));
-				castr.setDsSemanaSintoma(lineOfCsv.get(columnIndex.get("ds_semana_sintoma")));
-				castr.setDtNascimento(lineOfCsv.get(columnIndex.get("dt_nascimento")));
-				castr.setTpSexo(lineOfCsv.get(columnIndex.get("tp_sexo")));
-				castr.setTpGestante(lineOfCsv.get(columnIndex.get("tp_gestante")));
-				castr.setTpRacaCor(lineOfCsv.get(columnIndex.get("tp_raca_cor")));
-				castr.setTpEscolaridade(lineOfCsv.get(columnIndex.get("tp_escolaridade")));
-				castr.setCoUfResidencia(lineOfCsv.get(columnIndex.get("co_uf_residencia")));
-				castr.setCoMunicipioResidencia(lineOfCsv.get(columnIndex.get("co_municipio_residencia")));
-				castr.setCoDistritoResidencia(lineOfCsv.get(columnIndex.get("co_distrito_residencia")));
+				castr.setNuNotificacao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("nu_notificacao"))));
+				castr.setTpNotificacao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_notificacao"))));
+				castr.setCoCid(this.checkColumnValue(lineOfCsv.get(columnIndex.get("co_cid"))));
+				castr.setDtNotificacao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("dt_notificacao"))));
+				castr.setDsSemanaNotificao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("ds_semana_notificacao"))));
+				castr.setAnoNotificacao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("ano_notificacao"))));
+				castr.setDtDiagnosticoSintoma(this.checkColumnValue(lineOfCsv.get(columnIndex.get("dt_diagnostico_sintoma"))));
+				castr.setDsSemanaSintoma(this.checkColumnValue(lineOfCsv.get(columnIndex.get("ds_semana_sintoma"))));
+				castr.setDtNascimento(this.checkColumnValue(lineOfCsv.get(columnIndex.get("dt_nascimento"))));
+				castr.setTpSexo(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_sexo"))));
+				castr.setTpGestante(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_gestante"))));
+				castr.setTpRacaCor(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_raca_cor"))));
+				castr.setTpEscolaridade(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_escolaridade"))));
+				castr.setCoUfResidencia(this.checkColumnValue(lineOfCsv.get(columnIndex.get("co_uf_residencia"))));
+				castr.setCoMunicipioResidencia(this.checkColumnValue(lineOfCsv.get(columnIndex.get("co_municipio_residencia"))));
+				castr.setCoDistritoResidencia(this.checkColumnValue(lineOfCsv.get(columnIndex.get("co_distrito_residencia"))));
 				
 				// Consulta BD
 				String bairroName = lineOfCsv.get(columnIndex.get("no_bairro_residencia"));
 				Integer bairroCode = this.dao.findBairroByName(bairroName);
 				castr.setCoBairroResidencia(bairroCode.toString());
 				
-				castr.setTpZonaResidencia(lineOfCsv.get(columnIndex.get("tp_zona_residencia")));
-				castr.setTpClassificacaoFinal(lineOfCsv.get(columnIndex.get("tp_classificacao_final")));
-				castr.setTpCriterioConfirmacao(lineOfCsv.get(columnIndex.get("tp_criterio_confirmacao")));
-				castr.setTpEvolucaoCaso(lineOfCsv.get(columnIndex.get("tp_evolucao_caso")));
+				castr.setTpZonaResidencia(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_zona_residencia"))));
+				castr.setTpClassificacaoFinal(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_classificacao_final"))));
+				castr.setTpCriterioConfirmacao(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_criterio_confirmacao"))));
+				castr.setTpEvolucaoCaso(this.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_evolucao_caso"))));
 			} 
 
 		}
@@ -180,6 +189,21 @@ public class ReadCSVFile {
 		}
 
 		return castr;
+	}
+	
+	/**
+	 * Faz a validacao do campo que vem do CSV, pois
+	 * existem campos vazios. Eh necessario retornar null
+	 * pois alguns campos sao FKs
+	 * @param columnValue valor
+	 * @return
+	 */
+	private String checkColumnValue(String columnValue){
+		if (columnValue.isEmpty()){
+			return null;
+		}else{
+			return columnValue;
+		}
 	}
 	
 	private Timestamp convertToTimestamp(String timestampSTR) {
