@@ -38,16 +38,15 @@ public class ReadCSVFile {
 			while ((this.line = br.readLine()) != null) {
 				lineNumber++;
 				String[] columnValue = this.line.split(this.csvSplit);
+				for (int i = 0; i < columnValue.length; i++) {
+					String firstLineColumnCSV = columnValue[i].replace("\"", "");
+					if (this.columnsDB.contains(firstLineColumnCSV)){
+						columnPositionCSV.put(firstLineColumnCSV, i);
+					}
 				if (lineNumber == 1){
 					/*
 					 * PEGAR O NOME DO BAIRRO
 					 */
-					for (int i = 0; i < columnValue.length; i++) {
-						String firstLineColumnCSV = columnValue[i].replace("\"", "");
-						if (this.columnsDB.contains(firstLineColumnCSV)){
-							columnPositionCSV.put(firstLineColumnCSV, i);
-						}
-					}
 				}else{
 					/*
 					 * MONTAR O OBJETO CASOS_AEDES
@@ -56,6 +55,7 @@ public class ReadCSVFile {
 							+ "Semana Notificacao=" + columnValue[columnPositionCSV.get("ds_semana_notificacao")]);
 				}
 
+				}
 			}
 			// Fechar conexao DB AQUI
 			
