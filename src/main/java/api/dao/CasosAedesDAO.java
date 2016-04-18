@@ -50,9 +50,9 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 */
 	public Integer findBairroByName(String name) throws SQLException{
 		Integer codigoBairro = 0;
-		this.query = "SELECT * FROM bairro_residencia WHERE nome = ?";
+		this.query = "SELECT * FROM bairro_residencia WHERE nome LIKE ? LIMIT 1";
 		this.queryExec = this.connDB.prepareStatement(query);
-		this.queryExec.setString(1, name);
+		this.queryExec.setString(1, "%"+name+"%");
 		ResultSet results = this.queryExec.executeQuery();
 		
 		while (results.next()){

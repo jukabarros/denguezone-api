@@ -46,7 +46,7 @@ public class ParserCSVtoDB {
 		int lineNumber = 0;
 		try{
 			this.dao.beforeExecuteQuery();
-			this.dao.prepareInsertCasosAedesTemp();
+			this.dao.prepareInsertCasosAedes();
 			this.br = new BufferedReader(new FileReader(pathFile));
 
 			// Faz a indexacao da coluna do CSV
@@ -140,7 +140,11 @@ public class ParserCSVtoDB {
 		try {
 			// Consulta BD
 			String bairroName = lineOfCsv.get(columnIndex.get("no_bairro_residencia"));
-			Integer bairroCode = this.dao.findBairroByName(bairroName);
+			String bairroCodeStr = null;
+			if (bairroName != null){
+				Integer bairroCode = this.dao.findBairroByName(bairroName);
+				bairroCodeStr = bairroCode.toString();
+			}
 			// Montagem do Objeto
 			CasosAedesStrings castr = new CasosAedesStrings(
 					lineOfCsv.get(columnIndex.get("nu_notificacao")),
@@ -159,7 +163,7 @@ public class ParserCSVtoDB {
 					lineOfCsv.get(columnIndex.get("co_uf_residencia")),
 					lineOfCsv.get(columnIndex.get("co_municipio_residencia")),
 					lineOfCsv.get(columnIndex.get("co_distrito_residencia")),
-					bairroCode.toString(),
+					bairroCodeStr,
 					lineOfCsv.get(columnIndex.get("tp_zona_residencia")),
 					lineOfCsv.get(columnIndex.get("tp_classificacao_final")),
 					lineOfCsv.get(columnIndex.get("tp_criterio_confirmacao")),
