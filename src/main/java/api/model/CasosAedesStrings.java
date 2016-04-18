@@ -32,6 +32,35 @@ public class CasosAedesStrings implements Serializable{
 		
 	}
 	
+	public CasosAedesStrings(String nuNotificacao, String tpNotificacao, String coCid, String dtNotificacao,
+			String dsSemanaNotificao, String anoNotificacao, String dtDiagnosticoSintoma, String dsSemanaSintoma,
+			String dtNascimento, String tpSexo, String tpGestante, String tpRacaCor, String tpEscolaridade,
+			String coUfResidencia, String coMunicipioResidencia, String coDistritoResidencia, String coBairroResidencia,
+			String tpZonaResidencia, String tpClassificacaoFinal, String tpCriterioConfirmacao, String tpEvolucaoCaso) {
+		super();
+		this.nuNotificacao = nuNotificacao;
+		this.tpNotificacao = tpNotificacao;
+		this.coCid = coCid;
+		this.dtNotificacao = dtNotificacao;
+		this.dsSemanaNotificao = dsSemanaNotificao;
+		this.anoNotificacao = anoNotificacao;
+		this.dtDiagnosticoSintoma = dtDiagnosticoSintoma;
+		this.dsSemanaSintoma = dsSemanaSintoma;
+		this.dtNascimento = dtNascimento;
+		this.tpSexo = tpSexo;
+		this.tpGestante = tpGestante;
+		this.tpRacaCor = tpRacaCor;
+		this.tpEscolaridade = tpEscolaridade;
+		this.coUfResidencia = coUfResidencia;
+		this.coMunicipioResidencia = coMunicipioResidencia;
+		this.coDistritoResidencia = coDistritoResidencia;
+		this.coBairroResidencia = coBairroResidencia;
+		this.tpZonaResidencia = tpZonaResidencia;
+		this.tpClassificacaoFinal = tpClassificacaoFinal;
+		this.tpCriterioConfirmacao = tpCriterioConfirmacao;
+		this.tpEvolucaoCaso = tpEvolucaoCaso;
+	}
+
 	public String getNuNotificacao() {
 		return nuNotificacao;
 	}

@@ -64,11 +64,31 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	
 
 	/**
+	 * Insert na tabela temporaria (sem as FKs) do BD. 
+	 * Usado para realizar os testes do parser
 	 * prepara a query para inserir muitos dados
 	 * @throws SQLException
 	 */
 	public void prepareInsertCasosAedesTemp() throws SQLException{
 		this.queryInsert = "INSERT INTO casos_aedes_temp"
+				+ " (nu_notificacao, tp_notificacao, co_cid, dt_notificacao, ds_semana_notificacao, ano_notificacao,"
+				+ "  dt_diagnostico_sintoma, ds_semana_sintoma, dt_nascimento, tp_sexo, tp_gestante, tp_raca_cor,"
+				+ "  tp_escolaridade, co_uf_residencia, co_municipio_residencia, co_distrito_residencia, co_bairro_residencia,"
+				+ "  tp_zona_residencia, tp_classificacao_final, tp_criterio_confirmacao, tp_evolucao_caso)"
+				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+		
+		this.queryExecInsert = this.connDB.prepareStatement(this.queryInsert);
+	
+	}
+	
+	/**
+	 * Insert na tabela principal (com as FKs) do BD. 
+	 * Usado para realizar os testes do parser
+	 * prepara a query para inserir muitos dados
+	 * @throws SQLException
+	 */
+	public void prepareInsertCasosAedes() throws SQLException{
+		this.queryInsert = "INSERT INTO casos_aedes"
 				+ " (nu_notificacao, tp_notificacao, co_cid, dt_notificacao, ds_semana_notificacao, ano_notificacao,"
 				+ "  dt_diagnostico_sintoma, ds_semana_sintoma, dt_nascimento, tp_sexo, tp_gestante, tp_raca_cor,"
 				+ "  tp_escolaridade, co_uf_residencia, co_municipio_residencia, co_distrito_residencia, co_bairro_residencia,"
@@ -109,7 +129,8 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		this.queryExecInsert.executeBatch();
 		
 		this.insertCount++;
-		if (this.insertCount%5==0){
+		if (this.insertCount%2000==0) {
+			System.out.println("** Registros Inseridos: "+this.insertCount);
 			this.connDB.commit();
 		}
 	}
