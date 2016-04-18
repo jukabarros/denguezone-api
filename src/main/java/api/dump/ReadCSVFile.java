@@ -46,33 +46,43 @@ public class ReadCSVFile {
 			this.br = new BufferedReader(new FileReader(pathFile));
 			// Faz a indexacao da coluna do CSV
 			Map<String, Integer> columnPositionCSV = new LinkedHashMap<String, Integer>();
-			
+			// Define o tamanho da lista que contem os valores das linhas
+			int rowSizeDefault = 0;
 			while ((this.line = br.readLine()) != null) {
 				lineNumber++;
 				String[] lineValues = this.line.split(this.csvSplit);
 				if (lineNumber == 1){
-					/*
-					 * PEGAR O NOME DO BAIRRO
-					 */
 					for (int i = 0; i < lineValues.length; i++) {
 						String firstLineColumnCSV = lineValues[i].replace("\"", "");
 						if (this.columnsDB.contains(firstLineColumnCSV)){
 							columnPositionCSV.put(firstLineColumnCSV, i);
+							rowSizeDefault = i;
 						}
 						// ADD Nome do Bairro para realizar a consulta
 						if (firstLineColumnCSV.equals("no_bairro_residencia")){
 							columnPositionCSV.put(firstLineColumnCSV, i);
+							// caso esta coluna for a ultima do csv
+							rowSizeDefault = i;
 						}
 					}
 					System.out.println("** Colunas: "+columnPositionCSV);
 				}else{
+					
 					List<String> allValuesByLine = this.removeMarkRegister(lineValues);
-					CasosAedesStrings ca = this.mountObjectCasosAedesStr(allValuesByLine, columnPositionCSV);
-					this.dao.insertCasosAedesTemp(ca);
+					int rowSizeFromCSV = allValuesByLine.size();
+					if (rowSizeFromCSV < rowSizeDefault+1) {
+						int diff = rowSizeDefault - rowSizeFromCSV;
+						for (int i = 0; i <= diff; i++) {
+							allValuesByLine.add(rowSizeFromCSV++, "");
+						}
+					}
+					
+					CasosAedesStrings caStr = this.mountObjectCasosAedesStr(allValuesByLine, columnPositionCSV);
+					this.dao.insertCasosAedesTemp(caStr);
 				}
 				
 				if (lineNumber%2000 == 0){
-					System.out.println("** Registro Inseridos: "+lineNumber);
+					System.out.println("** Registros Inseridos: "+lineNumber);
 				}
 
 			}
@@ -101,6 +111,20 @@ public class ReadCSVFile {
 		
 		System.out.println("\n\n*** Total Registro: "+(lineNumber-1));
 		System.out.println("*** Fim :)");
+	}
+	
+	/**
+	 * Remove as aspas dos valores que vem do CSV
+	 * @param line linha do csv
+	 * @return list lista com os novos valores sem as aspas
+	 */
+	private List<String> removeMarkRegister (String[] line){
+		List<String> lineNoMarks = new ArrayList<String>();
+		for (int i = 0; i < line.length; i++) {
+			String columnValue = line[i].replace("\"", "");
+			lineNoMarks.add(columnValue);
+		}
+		return lineNoMarks;
 	}
 	
 	/**
@@ -143,8 +167,7 @@ public class ReadCSVFile {
 
 		}
 		catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Erro na montagem do Objeto: "+e.getMessage());
 		}
 
 		return ca;
@@ -184,8 +207,7 @@ public class ReadCSVFile {
 
 		}
 		catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Erro na montagem do Objeto: "+e.getMessage());
 		}
 
 		return castr;
@@ -218,19 +240,7 @@ public class ReadCSVFile {
 		}
 	}
 	
-	/**
-	 * Remove as aspas dos valores que vem do CSV
-	 * @param line linha do csv
-	 * @return list lista com os novos valores sem as aspas
-	 */
-	private List<String> removeMarkRegister (String[] line){
-		List<String> lineNoMarks = new ArrayList<>();
-		for (int i = 0; i < line.length; i++) {
-			String columnValue = line[i].replace("\"", "");
-			lineNoMarks.add(columnValue);
-		}
-		return lineNoMarks;
-	}
+	
 	
 	/**
 	 * Calcula tempo de execucao do import
@@ -246,7 +256,6 @@ public class ReadCSVFile {
 		
 		return totalTime;
 	}
-	
 	
 	/*
 	 * DAO 
