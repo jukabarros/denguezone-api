@@ -10,7 +10,7 @@ public class ImportCSVDataApp {
 			csvFile = "/home/juccelino.barros/Desktop/UFRPE/Mestrado/"
 					+ "ProgramacaoAplicada/projeto/casos-doencas/"
 					+ "casos-dengue2015.csv";
-		} else{
+		} else {
 			csvFile = args[0];
 		}
 		

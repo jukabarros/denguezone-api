@@ -41,29 +41,6 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	}
 	
 	/**
-	 * Consulta um bairro pelo nome e retorna seu codigo.
-	 * Metodo utilizado para inserir o codigo correto na
-	 * tabela casos_aedes
-	 * @param name
-	 * @return
-	 * @throws SQLException 
-	 */
-	public Integer findBairroByName(String name) throws SQLException{
-		Integer codigoBairro = 0;
-		this.query = "SELECT * FROM bairro_residencia WHERE nome LIKE ? LIMIT 1";
-		this.queryExec = this.connDB.prepareStatement(query);
-		this.queryExec.setString(1, "%"+name+"%");
-		ResultSet results = this.queryExec.executeQuery();
-		
-		while (results.next()){
-			codigoBairro = results.getInt("codigo");
-		}
-		results.close();
-		return codigoBairro;
-	}
-	
-
-	/**
 	 * Insert na tabela temporaria (sem as FKs) do BD. 
 	 * Usado para realizar os testes do parser
 	 * prepara a query para inserir muitos dados
@@ -99,7 +76,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	
 	}
 	
-	public void insertCasosAedesTemp(CasosAedesStrings cas) throws SQLException{
+	public void insertCasosAedesRegister(CasosAedesStrings cas) throws SQLException{
 		int index = 0;
 		
 		this.queryExecInsert.setString(++index, cas.getNuNotificacao());
@@ -134,4 +111,56 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 			this.connDB.commit();
 		}
 	}
+	
+	
+	/*
+	 * Consulta as Tabelas Auxiliares
+	 */
+	
+	/**
+	 * Consulta um bairro pelo nome e retorna seu codigo.
+	 * Metodo utilizado para inserir o codigo correto na
+	 * tabela casos_aedes
+	 * @param name
+	 * @return
+	 * @throws SQLException 
+	 */
+	public Integer findBairroByName(String name) throws SQLException {
+		Integer codigoBairro = 0;
+		this.query = "SELECT * FROM bairro_residencia WHERE nome LIKE ? LIMIT 1";
+		this.queryExec = this.connDB.prepareStatement(query);
+		this.queryExec.setString(1, "%"+name+"%");
+		ResultSet results = this.queryExec.executeQuery();
+		
+		while (results.next()){
+			codigoBairro = results.getInt("codigo");
+		}
+		results.close();
+		return codigoBairro;
+	}
+	
+	/**
+	 * Verifica se o ID do que vem  do CSV existe nas 
+	 * tabelas que possuem relacionamento com a chave estrangeira da tabela
+	 * casos_aedes.
+	 * @param id idStr pois é como vem no CSV
+	 * @return boolean true or false 
+	 * @throws SQLException 
+	 */
+	public boolean checkFKDB(String codeStr, String table) throws SQLException {
+		boolean checkID = false;
+		this.query = "SELECT * FROM "+table+" WHERE codigo = ?";
+		this.queryExec = this.connDB.prepareStatement(query);
+		this.queryExec.setString(1, codeStr);
+		ResultSet results = this.queryExec.executeQuery();
+		
+		if (results.next()){
+			checkID = true;
+		}
+		results.close();
+		return checkID;
+		
+	}
+	
+	
 }

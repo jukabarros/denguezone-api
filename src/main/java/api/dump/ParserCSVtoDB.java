@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import api.dao.CasosAedesDAO;
 import api.model.CasosAedesStrings;
 
 /**
@@ -25,16 +23,18 @@ public class ParserCSVtoDB {
 	private BufferedReader br;
 	private String csvSplit;
 	private String line;
-	private CasosAedesDAO dao;
 	private List<String> columnsDB;
+	
+	private ServiceParserCSVtoDB service;
 	
 	public ParserCSVtoDB() {
 		super();
 		this.br = null;
 		this.csvSplit = ";";
 		this.line = "";
-		this.columnsDB = getAllColumnsDBCasosAedes();
-		this.dao = new CasosAedesDAO();
+		
+		this.service = new ServiceParserCSVtoDB();
+		this.columnsDB = this.service.getAllColumnsDBCasosAedes();
 	}
 	
 	/**
@@ -43,16 +43,16 @@ public class ParserCSVtoDB {
 	 */
 	public void parserCSVtoDB(String pathFile){
 		long startTime = System.currentTimeMillis();
+		
 		int lineNumber = 0;
+		// Faz a indexacao da coluna do CSV
+		Map<String, Integer> columnPositionCSV = new LinkedHashMap<String, Integer>();
+		// Define o tamanho da lista, o index da ultima coluna do CSV referente ao DB
+		int rowSizeDefault = 0;
 		try{
-			this.dao.beforeExecuteQuery();
-			this.dao.prepareInsertCasosAedes();
+			this.service.openConnectionDB();
+			this.service.prepareInsertCasosAedes();
 			this.br = new BufferedReader(new FileReader(pathFile));
-
-			// Faz a indexacao da coluna do CSV
-			Map<String, Integer> columnPositionCSV = new LinkedHashMap<String, Integer>();
-			// Define o tamanho da lista, o index da ultima coluna do CSV referente ao DB
-			int rowSizeDefault = 0;
 			while ((this.line = br.readLine()) != null) {
 				lineNumber++;
 				String[] lineValues = this.line.split(this.csvSplit);
@@ -70,25 +70,28 @@ public class ParserCSVtoDB {
 							rowSizeDefault = i;
 						}
 					}
+					if (columnPositionCSV.size() != 22) {
+						System.out.println("Erro: número de colunas inválido");
+						break;
+					}
+					// Fazer validacao se possuem todas as colunas da tabela?
 					System.out.println("** Colunas:\n"+columnPositionCSV);
 				}else{
 					List<String> allValuesByLine = this.filterLineRegister(lineValues, rowSizeDefault);
 					CasosAedesStrings caStr = this.mountObjectCasosAedesStr(allValuesByLine, columnPositionCSV);
-					this.dao.insertCasosAedesTemp(caStr);
+					this.service.insertCasosAedesRegister(caStr);
 				}
 
 			}
 			
-			this.dao.closeInsertQuery();
-			this.dao.afterExecuteQuery();
+			this.service.closeInsertQuery();
+			this.service.closeConnectionDB();
 			long endTime = System.currentTimeMillis();
 			this.calcTimeExecution(startTime, endTime);
 			
 		}catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			if (br != null) {
@@ -127,6 +130,7 @@ public class ParserCSVtoDB {
 		
 		if (rowSizeDefault >= sizeCSVLine) {
 			int diff = rowSizeDefault - sizeCSVLine;
+			// ADD null na lista ate o index rowSizeDefault
 			for (int i = 0; i <= diff; i++) {
 				lineFiltered.add(sizeCSVLine++, null);
 			}
@@ -138,17 +142,51 @@ public class ParserCSVtoDB {
 	
 	private CasosAedesStrings mountObjectCasosAedesStr(List<String> lineOfCsv, Map<String, Integer> columnIndex) {
 		try {
-			// Consulta BD
 			String bairroName = lineOfCsv.get(columnIndex.get("no_bairro_residencia"));
 			String bairroCodeStr = null;
+			
+			// Faz a mudanca do codigo do Bairro
 			if (bairroName != null){
-				Integer bairroCode = this.dao.findBairroByName(bairroName);
-				bairroCodeStr = bairroCode.toString();
+				bairroCodeStr = this.service.getBairroIDByName(bairroName);
 			}
+			
+			String tpNotificacao = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_notificacao")),
+					this.service.getTpNotificacaoIDs(), "tipo_notificacao");
+			
+			String tpGestante = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_gestante")),
+					this.service.getTpGestanteIDs(), "tipo_gestante" );
+			
+			String tpRacaCor = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_raca_cor")),
+					this.service.getTpRacaCorIDs(), "raca_cor");
+			
+			String tpEscolaridade = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_escolaridade")),
+					this.service.getTpEscolaridadeIDs(), "escolaridade");
+			
+			String coUfResidencia = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("co_uf_residencia")),
+					this.service.getCoUfResidenciaIDs(), "uf_residencia");
+			
+			String coMunicipioResidencia = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("co_municipio_residencia")),
+					this.service.getCoMunicipioResidenciaIDs(), "municipio_residencia");
+			
+			String coDistritoResidencia = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("co_distrito_residencia")),
+					this.service.getCoDistritoResidenciaIDs(), "distrito_residencia");
+			
+			String tpZonaResidencia = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_zona_residencia")),
+					this.service.getTpZonaResidenciaIDs(), "zona_residencia");
+			
+			String tpClassificacaoFinal = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_classificacao_final")),
+					this.service.getTpClassificacaoFinalIDs(), "classificacao_final");
+			
+			String tpCriterioConfirmacao = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_criterio_confirmacao")),
+					this.service.getTpCriterioConfirmacaoIDs(), "criterio_confirmacao");
+			
+			String tpEvolucaoCaso = this.service.checkColumnValue(lineOfCsv.get(columnIndex.get("tp_evolucao_caso")),
+					this.service.getTpEvolucaoCasoIDs(), "evolucao_caso");
+			
 			// Montagem do Objeto
 			CasosAedesStrings castr = new CasosAedesStrings(
 					lineOfCsv.get(columnIndex.get("nu_notificacao")),
-					lineOfCsv.get(columnIndex.get("tp_notificacao")),
+					tpNotificacao,
 					lineOfCsv.get(columnIndex.get("co_cid")),
 					lineOfCsv.get(columnIndex.get("dt_notificacao")),
 					lineOfCsv.get(columnIndex.get("ds_semana_notificacao")),
@@ -157,24 +195,19 @@ public class ParserCSVtoDB {
 					lineOfCsv.get(columnIndex.get("ds_semana_sintoma")),
 					lineOfCsv.get(columnIndex.get("dt_nascimento")),
 					lineOfCsv.get(columnIndex.get("tp_sexo")),
-					lineOfCsv.get(columnIndex.get("tp_gestante")),
-					lineOfCsv.get(columnIndex.get("tp_raca_cor")),
-					lineOfCsv.get(columnIndex.get("tp_escolaridade")),
-					lineOfCsv.get(columnIndex.get("co_uf_residencia")),
-					lineOfCsv.get(columnIndex.get("co_municipio_residencia")),
-					lineOfCsv.get(columnIndex.get("co_distrito_residencia")),
+					tpGestante,
+					tpRacaCor,
+					tpEscolaridade,
+					coUfResidencia,
+					coMunicipioResidencia,
+					coDistritoResidencia,
 					bairroCodeStr,
-					lineOfCsv.get(columnIndex.get("tp_zona_residencia")),
-					lineOfCsv.get(columnIndex.get("tp_classificacao_final")),
-					lineOfCsv.get(columnIndex.get("tp_criterio_confirmacao")),
-					lineOfCsv.get(columnIndex.get("tp_evolucao_caso"))
-					);
+					tpZonaResidencia,
+					tpClassificacaoFinal,
+					tpCriterioConfirmacao,
+					tpEvolucaoCaso );
 
 			return castr;
-		}
-		catch (SQLException e) {
-			System.out.println("SQL - erro na montagem do Objeto: "+e.getMessage());
-			return null;
 		} catch (Exception e){
 			System.out.println("Erro na montagem do Objeto: "+e.getMessage());
 			return null;
@@ -197,26 +230,4 @@ public class ParserCSVtoDB {
 		return totalTime;
 	}
 	
-
-	/*
-	 * DAO 
-	 */
-	/**
-	 * Faz uma consulta que retorna todas as colunas da tabela 
-	 * casos aedes. Na leitura do CSV so sera feita a leitura 
-	 * das colunas referentes a esta consulta.
-	 * @return lista colunas da tabela casos aedes.
-	 */
-	public List<String> getAllColumnsDBCasosAedes() {
-		CasosAedesDAO casosDAO = new CasosAedesDAO();
-		List<String> allColumnsDB = new ArrayList<String>();
-		
-		try {
-			allColumnsDB = casosDAO.getAllColumns();
-		} catch (SQLException e) {
-			System.out.println("Erro Casos Aedes DAO: "+e.getMessage());
-		}
-		return allColumnsDB;
-	}
-
 }
