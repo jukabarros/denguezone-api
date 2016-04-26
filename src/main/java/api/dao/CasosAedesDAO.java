@@ -49,7 +49,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		
 		this.afterExecuteQuery();
 		// Add valor 0 caso nao apresente nenhuma notificacao em determinado mes
-		if (meses.size() != 11){
+		if (meses.size() != 12){
 			for (int i = 1; i <= 12; i++) {
 				if (!meses.contains(i)){
 					valoresGrafico.add(i-1, 0);
