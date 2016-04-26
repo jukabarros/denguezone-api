@@ -17,7 +17,6 @@ import api.dao.BairroResidenciaDAO;
 import api.dao.CasosAedesDAO;
 import api.model.BairroResidencia;
 import api.model.Error;
-import api.model.ValoresPorMesBairro;
 
 @RestController
 @RequestMapping("/casosaedes")
@@ -34,8 +33,8 @@ public class CasosAedesController {
 	 		BairroResidenciaDAO bairroDAO = new BairroResidenciaDAO();
 	 		BairroResidencia bairro = bairroDAO.findBairroByName(nomeBairro);
 	 		if (bairro.getCodigo() != null) {
-	 			List<ValoresPorMesBairro> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(bairro.getCodigo(), ano);
-	 			return new ResponseEntity<List<ValoresPorMesBairro>>(casosPorMesBairro, HttpStatus.OK);
+	 			List<Integer> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(bairro.getCodigo(), ano);
+	 			return new ResponseEntity<List<Integer>>(casosPorMesBairro, HttpStatus.OK);
 	 		} else {
 	 			return new ResponseEntity<Error>(new Error(404, "Bairro não encontrado"), HttpStatus.NOT_FOUND); 
 	 		}
