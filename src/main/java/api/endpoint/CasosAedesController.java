@@ -13,36 +13,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import api.dao.BairroResidenciaDAO;
 import api.dao.CasosAedesDAO;
-import api.model.BairroResidencia;
 import api.model.Error;
 
 @RestController
 @RequestMapping("/casosaedes")
 public class CasosAedesController {
-	
+
 	@Autowired
 	private CasosAedesDAO casosAedesDAO;
-	
-	@RequestMapping(value = "/{nomeBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
+
+	@RequestMapping(value = "/{codBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
 	public ResponseEntity<?> getUsers(HttpServletRequest request,
-			@PathVariable String nomeBairro,
+			@PathVariable int codBairro,
 			@PathVariable int ano){
-	 	try {
-	 		BairroResidenciaDAO bairroDAO = new BairroResidenciaDAO();
-	 		BairroResidencia bairro = bairroDAO.findBairroByName(nomeBairro);
-	 		if (bairro.getCodigo() != null) {
-	 			List<Integer> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(bairro.getCodigo(), ano);
-	 			return new ResponseEntity<List<Integer>>(casosPorMesBairro, HttpStatus.OK);
-	 		} else {
-	 			return new ResponseEntity<Error>(new Error(404, "Bairro não encontrado"), HttpStatus.NOT_FOUND); 
-	 		}
-	 		
-	 	} catch (Exception e) {
-	 		System.err.println(e.getMessage());
-	 		return new ResponseEntity<Error>(new Error(500, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-	 	}	 	
+		try {
+			List<Integer> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(codBairro, ano);
+			if (casosPorMesBairro.isEmpty()) {
+				return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
+			} 
+			return new ResponseEntity<List<Integer>>(casosPorMesBairro, HttpStatus.OK);
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new ResponseEntity<Error>(new Error(500, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}	 	
 	}
 
 }
