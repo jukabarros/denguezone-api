@@ -6,8 +6,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import api.model.CasosAedesStrings;
+import org.springframework.stereotype.Repository;
 
+import api.model.CasosAedesStrings;
+import api.model.ValoresPorMesBairro;
+
+@Repository("casosAedesDAO")
 public class CasosAedesDAO extends AbstractDAO implements Serializable{
 
 	private static final long serialVersionUID = -3992334995663647691L;
@@ -16,6 +20,36 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	
 	public CasosAedesDAO() {
 		this.insertCount = 0;
+	}
+	
+	/**
+	 * Recupera o numero de casos por mes de um determinado
+	 * bairro em um determinado ano
+	 * @param codigoBairro codigo do bairro
+	 * @param ano
+	 * @throws SQLException
+	 */
+	public List<ValoresPorMesBairro> getValuesByMonthBairro(Integer codigoBairro, Integer ano) throws SQLException {
+		List<ValoresPorMesBairro> valoresGrafico = new ArrayList<ValoresPorMesBairro>();
+		this.beforeExecuteQuery();
+		this.query = "SELECT MONTH(dt_notificacao) AS mes, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
+				+ "WHERE b.codigo = ca.co_bairro_residencia AND b.codigo = ? AND ca.ano_notificacao = ? "
+				+ "GROUP BY MONTH(dt_notificacao) ORDER BY mes;";
+		
+		this.queryExec = this.connDB.prepareStatement(this.query);
+		this.queryExec.setInt(1, codigoBairro);
+		this.queryExec.setInt(2, ano);
+		
+		ResultSet results = this.queryExec.executeQuery();
+		
+		while (results.next()){
+			valoresGrafico.add(new ValoresPorMesBairro(results.getInt("mes"), 
+					results.getInt("quantidade")));
+		}
+		results.close();
+		
+		this.afterExecuteQuery();
+		return valoresGrafico;
 	}
 	
 	/**
