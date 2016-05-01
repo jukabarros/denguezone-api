@@ -33,14 +33,25 @@ public abstract class AbstractDAO {
 	 * Metodo before e after sao usados para
 	 * abrir e fechar conexao
 	 */
+	
 	public void beforeExecuteQuery() throws SQLException{
+		if (this.connDB == null || this.connDB.isClosed()){
+			this.connDB = new DBConnect().connectMysql();
+		}
+	}
+	
+	public void afterExecuteQuery() throws SQLException{
+		this.queryExec.close();
+		this.connDB.close();
+	}
+	
+	public void beforeExecuteImport() throws SQLException{
 		if (this.connDB == null || this.connDB.isClosed()){
 			this.connDB = new DBConnect().connectMysql();
 			this.connDB.setAutoCommit(false);
 		}
 	}
-	
-	public void afterExecuteQuery() throws SQLException{
+	public void afterExecuteImport() throws SQLException{
 		this.queryExec.close();
 		this.connDB.commit();
 		this.connDB.close();

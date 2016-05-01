@@ -61,6 +61,45 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	}
 	
 	/**
+	 * Recupera o numero de casos por mes de um determinado
+	 * bairro em um determinado ano
+	 * @param codigoBairro codigo do bairro
+	 * @param ano
+	 * @throws SQLException
+	 */
+	public List<Integer> getValuesByMonthCity(Integer codigoCidade, Integer ano) throws SQLException {
+		this.beforeExecuteQuery();
+		this.query = "SELECT MONTH(dt_notificacao) AS mes, COUNT(*) AS quantidade FROM casos_aedes ca, municipio_residencia m "
+				+ " WHERE m.codigo = ca.co_municipio_residencia AND m.codigo = ? AND ca.ano_notificacao = ? "
+				+ " GROUP BY MONTH(dt_notificacao) ORDER BY MONTH(dt_notificacao);";
+		
+		this.queryExec = this.connDB.prepareStatement(this.query);
+		this.queryExec.setInt(1, codigoCidade);
+		this.queryExec.setInt(2, ano);
+		
+		ResultSet results = this.queryExec.executeQuery();
+		List<Integer> valoresGrafico = new ArrayList<Integer>();
+		List<Integer> meses = new ArrayList<Integer>();
+		while (results.next()){
+			meses.add(results.getInt("mes"));
+			valoresGrafico.add(results.getInt("quantidade"));
+		}
+		results.close();
+		
+		this.afterExecuteQuery();
+		// Add valor 0 caso nao apresente nenhuma notificacao em determinado mes
+		if (meses.size() != 12){
+			for (int i = 1; i <= 12; i++) {
+				if (!meses.contains(i)){
+					valoresGrafico.add(i-1, 0);
+				}
+			}
+		}
+		
+		return valoresGrafico;
+	}
+	
+	/**
 	 * Retorna todas as colunas da tabela casos_aedes
 	 * @return list 
 	 * @throws SQLException 

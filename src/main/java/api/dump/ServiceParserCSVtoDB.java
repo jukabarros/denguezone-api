@@ -61,7 +61,7 @@ public class ServiceParserCSVtoDB {
 	 */
 	public void openConnectionDB() {
 		try {
-			this.dao.beforeExecuteQuery();
+			this.dao.beforeExecuteImport();
 		} catch (SQLException e) {
 			System.out.println("Erro ao abrir conexão com o BD:\n"+e.getMessage());
 		}
@@ -77,7 +77,7 @@ public class ServiceParserCSVtoDB {
 	
 	public void closeConnectionDB() {
 		try {
-			this.dao.afterExecuteQuery();
+			this.dao.afterExecuteImport();
 		} catch (SQLException e) {
 			System.out.println("Erro ao fechar conexão com o BD:\n"+e.getMessage());
 		}

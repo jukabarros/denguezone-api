@@ -23,8 +23,42 @@ public class CasosAedesController {
 	@Autowired
 	private CasosAedesDAO casosAedesDAO;
 
-	@RequestMapping(value = "/{codBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
-	public ResponseEntity<?> getUsers(HttpServletRequest request,
+	/**
+	 * Retorna os valores referente a quantidade de notificacao
+	 * por bairro e ano. Usado para o grafico barra
+	 * 
+	 * @param request request
+	 * @param codBairro codigo do bairro
+	 * @param ano ano
+	 * @return grafico barra
+	 */
+	@RequestMapping(value = "/{codBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> getQntdByBairrosAno(HttpServletRequest request,
+			@PathVariable int codBairro,
+			@PathVariable int ano){
+		try {
+			List<Integer> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(codBairro, ano);
+			if (casosPorMesBairro.isEmpty()) {
+				return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
+			} 
+			return new ResponseEntity<List<Integer>>(casosPorMesBairro, HttpStatus.OK);
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new ResponseEntity<Error>(new Error(500, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}	 	
+	}
+	
+	/**
+	 * Retorna o numero de notificacao de uma cidade por mes e ano.
+	 * Usado para criar o grafico linha
+	 * @param request request
+	 * @param codCidade codigo cidade
+	 * @param ano ano
+	 * @return valores do grafico linha
+	 */
+	@RequestMapping(value = "/{codCidade}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> getQntdByCidadeAno(HttpServletRequest request,
 			@PathVariable int codBairro,
 			@PathVariable int ano){
 		try {
