@@ -32,7 +32,7 @@ public class CasosAedesController {
 	 * @param ano ano
 	 * @return grafico barra
 	 */
-	@RequestMapping(value = "/{codBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "graficobarra/{codBairro}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> getQntdByBairrosAno(HttpServletRequest request,
 			@PathVariable int codBairro,
 			@PathVariable int ano){
@@ -57,16 +57,16 @@ public class CasosAedesController {
 	 * @param ano ano
 	 * @return valores do grafico linha
 	 */
-	@RequestMapping(value = "/{codCidade}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "graficolinha/{codCidade}/{ano}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> getQntdByCidadeAno(HttpServletRequest request,
-			@PathVariable int codBairro,
+			@PathVariable int codCidade,
 			@PathVariable int ano){
 		try {
-			List<Integer> casosPorMesBairro = this.casosAedesDAO.getValuesByMonthBairro(codBairro, ano);
-			if (casosPorMesBairro.isEmpty()) {
+			List<Integer> casosPorAnoCidade = this.casosAedesDAO.getValuesByMonthCity(codCidade, ano);
+			if (casosPorAnoCidade.isEmpty()) {
 				return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
 			} 
-			return new ResponseEntity<List<Integer>>(casosPorMesBairro, HttpStatus.OK);
+			return new ResponseEntity<List<Integer>>(casosPorAnoCidade, HttpStatus.OK);
 
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

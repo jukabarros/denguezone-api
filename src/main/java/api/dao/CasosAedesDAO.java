@@ -67,14 +67,14 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 * @param ano
 	 * @throws SQLException
 	 */
-	public List<Integer> getValuesByMonthCity(Integer codigoCidade, Integer ano) throws SQLException {
+	public List<Integer> getValuesByMonthCity(Integer codCidade, Integer ano) throws SQLException {
 		this.beforeExecuteQuery();
 		this.query = "SELECT MONTH(dt_notificacao) AS mes, COUNT(*) AS quantidade FROM casos_aedes ca, municipio_residencia m "
 				+ " WHERE m.codigo = ca.co_municipio_residencia AND m.codigo = ? AND ca.ano_notificacao = ? "
 				+ " GROUP BY MONTH(dt_notificacao) ORDER BY MONTH(dt_notificacao);";
 		
 		this.queryExec = this.connDB.prepareStatement(this.query);
-		this.queryExec.setInt(1, codigoCidade);
+		this.queryExec.setInt(1, codCidade);
 		this.queryExec.setInt(2, ano);
 		
 		ResultSet results = this.queryExec.executeQuery();
