@@ -27,7 +27,7 @@ public class BairroResidenciaController {
 	private BairroResidenciaDAO bairroDAO;
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
-	public ResponseEntity<?> getUsers(HttpServletRequest request,
+	public ResponseEntity<?> getBairros(HttpServletRequest request,
 			@RequestParam(value = "name", required = false) String name){
 		List<BairroResidencia> bairros = new ArrayList<BairroResidencia>();
 	 	try {
@@ -41,7 +41,7 @@ public class BairroResidenciaController {
 	}
 	
 	@RequestMapping(value = "/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
-	public ResponseEntity<?> getUserByID(HttpServletRequest request, 
+	public ResponseEntity<?> getBairrosByName(HttpServletRequest request, 
 			@PathVariable String name) {
 	 	try {
 	 		BairroResidencia bairro = this.bairroDAO.findBairroByName(name.toUpperCase());
