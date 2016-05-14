@@ -62,10 +62,12 @@ public class DenunciaController {
 	public ResponseEntity<?> postDenuncia(HttpServletRequest request, @RequestBody String json){
 	 	try {
 	 		DenunciaJsonParser parser = new DenunciaJsonParser();
-	 		Denuncia d = parser.jsonToDenuncia(json);
+	 		Denuncia novaDenuncia = parser.jsonToDenunciaInsert(json);
 	 		// Retorna a denuncia ja cadastrada no BD para o usuario ver o Protocolo
-	 		Denuncia novaDenuncia = this.denunciaDAO.insertDenuncia(d);
-	 		return new ResponseEntity<Denuncia>(novaDenuncia, HttpStatus.OK);
+	 		String protocolo = this.denunciaDAO.insertDenuncia(novaDenuncia.getBairro(),
+	 				novaDenuncia.getEndereco(),
+	 				novaDenuncia.getDescricao());
+	 		return new ResponseEntity<String>(protocolo, HttpStatus.OK);
 	 		
 	 	} catch (Exception e) {
 	 		System.err.println(e.getMessage());

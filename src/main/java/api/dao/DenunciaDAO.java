@@ -3,7 +3,6 @@ package api.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -74,58 +73,27 @@ public class DenunciaDAO extends AbstractDAO {
 	/**
 	 * Insere uma nova denuncia no sistema. Retorna a nova denuncia para o usuario saber o protocolo
 	 * @param d Denuncia nova
-	 * @return denuncia registro ja cadastro no BD
+	 * @return protocolo da nova denuncia
 	 * @throws SQLException
 	 */
-	public Denuncia insertDenuncia(Denuncia d) throws SQLException {
+	public String insertDenuncia(String bairro, String endereco, String descricao) throws SQLException {
+		Date agora = new Date();
+		Timestamp dataCriacao = new Timestamp(agora.getTime());
+		String protocolo = "p"+dataCriacao.getTime();
 		this.beforeExecuteQuery();
-		this.query = "INSERT INTO denuncia (bairro, endereco, descricao, status, data_criacao)"
+		this.query = "INSERT INTO denuncia (protocolo, bairro, endereco, descricao, status, data_criacao)"
 				+ " VALUES (?,?,?,?,?,?)";
 		this.queryExec = this.connDB.prepareStatement(query);
-		this.queryExec.setString(1, d.getBairro());
-		this.queryExec.setString(2, d.getEndereco());
-		this.queryExec.setString(3, d.getDescricao());
-		this.queryExec.setString(4, "PENDENTE");
-		Timestamp dataCriacao = new Timestamp(new Date().getTime());
-		this.queryExec.setTimestamp(5, dataCriacao);
+		this.queryExec.setString(1, protocolo);
+		this.queryExec.setString(2, bairro);
+		this.queryExec.setString(3, endereco);
+		this.queryExec.setString(4, descricao);
+		this.queryExec.setString(5, "PENDENTE");
+		this.queryExec.setTimestamp(6, dataCriacao);
 		this.queryExec.execute();
 		
 		this.afterExecuteQuery();
-		Denuncia denuncia = this.findDenunciaByProtocolo(d.getProtocolo());
-		return denuncia;
-	}
-	
-	/**
-	 * Metodo que cria um protocolo para a nova denuncia
-	 * @param id o protocolo é baseado no ID e na Data de Criacao 
-	 * @return protocolo
-	 * @throws SQLException 
-	 */
-	// TODO
-	private String generateProtocolo(Timestamp dataCriacao) throws SQLException {
-		String protocolo = null;
-		int lastID = this.getLastID();
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 		return protocolo;
 	}
 	
-	/**
-	 * Realiza uma consulta pelo protocolo
-	 * @param protocolo protocolo a ser consultado
-	 * @return
-	 * @throws SQLException
-	 */
-	private Integer getLastID() throws SQLException {
-		this.query = "SELECT * FROM denuncia ORDER BY id DESC;";
-		this.queryExec = this.connDB.prepareStatement(query);
-		ResultSet results = this.queryExec.executeQuery();
-		int id = 0;
-		while (results.next()){
-			id = results.getInt("id");
-			
-		}
-		results.close();
-		return id;
-	}
-
 }

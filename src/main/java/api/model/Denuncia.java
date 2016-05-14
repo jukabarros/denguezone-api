@@ -3,6 +3,8 @@ package api.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * Classe que representa uma denuncia do sistema.
  * @author juccelino.barros
@@ -18,7 +20,9 @@ public class Denuncia implements Serializable {
 	private String descricao;
 	private String status;
 	
+	@JsonFormat(pattern="dd/MM/yyyy")
 	private Timestamp dataCriacao;
+	@JsonFormat(pattern="dd/MM/yyyy")
 	private Timestamp dataAtualizacao;
 	
 	public Denuncia() {
