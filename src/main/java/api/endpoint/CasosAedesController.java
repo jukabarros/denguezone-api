@@ -1,5 +1,8 @@
 package api.endpoint;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import api.dao.CasosAedesDAO;
+import api.model.CasosAedesEntreDatas;
 import api.model.Error;
 
 @RestController
@@ -23,8 +28,50 @@ public class CasosAedesController {
 	@Autowired
 	private CasosAedesDAO casosAedesDAO;
 
+	
 	/**
-	 * Retorna os valores referente a quantidade de notificacao
+	 * Retorna os valores referentes as notificacoes num periodo
+	 * de 2 datas em um bairro especifico
+	 * 
+	 * @param request request
+	 * @param codBairro codigo do bairro
+	 * @param ano ano
+	 * @return grafico barra
+	 */
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<?> getQntdEntreDatasByBairro(HttpServletRequest request,
+			@RequestParam(value = "codbairro", required = true) int codBairro,
+			@RequestParam(value = "datainicio", required = true) String dataInicioStr,
+			@RequestParam(value = "datafim", required = true) String dataFimStr) {
+		try {
+			Date dateInit = new SimpleDateFormat("dd-MM-yyyy").parse(dataInicioStr);
+			Date dateEnd = new SimpleDateFormat("dd-MM-yyyy").parse(dataFimStr);
+			
+			if (dateInit.after(dateEnd)) {
+				return new ResponseEntity<Error>(new Error(400, "Intervalo de datas inválido"), HttpStatus.BAD_REQUEST); 
+			} else {
+				
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				String dataInicio = df.format(dateInit);
+				String dataFim = df.format(dateEnd);
+				
+				List<CasosAedesEntreDatas> casosEntreDatasBairro = this.casosAedesDAO.getBetweenDateByBairro(
+						codBairro, dataInicio, dataFim);
+				
+				if (casosEntreDatasBairro.isEmpty()) {
+					return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
+				} 
+				return new ResponseEntity<List<CasosAedesEntreDatas>>(casosEntreDatasBairro, HttpStatus.OK);
+			}
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new ResponseEntity<Error>(new Error(500, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}	 	
+	}
+	
+	/**
+	 * Retorna os valores referentes a quantidade de notificacao
 	 * por bairro e ano. Usado para o grafico barra
 	 * 
 	 * @param request request

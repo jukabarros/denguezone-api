@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import api.model.CasosAedesEntreDatas;
 import api.model.CasosAedesStrings;
 
 @Repository("casosAedesDAO")
@@ -97,6 +98,38 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		}
 		
 		return valoresGrafico;
+	}
+	
+	/**
+	 * Recupera o numero de casos por mes de um determinado
+	 * bairro em um determinado ano
+	 * @param codigoBairro codigo do bairro
+	 * @param ano
+	 * @throws SQLException
+	 */
+	public List<CasosAedesEntreDatas> getBetweenDateByBairro(Integer codBairro, String dateInit, String dateEnd) throws SQLException {
+		this.beforeExecuteQuery();
+		this.query = "SELECT dt_notificacao AS data_notificacao, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
+				+ " WHERE b.codigo = ca.co_bairro_residencia AND b.codigo = ? AND ca.dt_notificacao BETWEEN ? AND ?"
+				+ " GROUP BY dt_notificacao ORDER BY dt_notificacao;";
+		
+		this.queryExec = this.connDB.prepareStatement(this.query);
+		this.queryExec.setInt(1, codBairro);
+		this.queryExec.setString(2, dateInit);
+		this.queryExec.setString(3, dateEnd);
+		
+		ResultSet results = this.queryExec.executeQuery();
+		List<CasosAedesEntreDatas> casosDatas = new ArrayList<CasosAedesEntreDatas>();
+		while (results.next()){
+			CasosAedesEntreDatas caed = new CasosAedesEntreDatas(results.getInt("quantidade"),
+					results.getTimestamp("data_notificacao"));
+			casosDatas.add(caed);
+		}
+		results.close();
+		
+		this.afterExecuteQuery();
+		
+		return casosDatas;
 	}
 	
 	/**
