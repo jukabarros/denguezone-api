@@ -52,7 +52,9 @@ public abstract class AbstractDAO {
 		}
 	}
 	public void afterExecuteImport() throws SQLException{
-		this.queryExec.close();
+		if (this.queryExec != null) {
+			this.queryExec.close();
+		}
 		this.connDB.commit();
 		this.connDB.close();
 	}

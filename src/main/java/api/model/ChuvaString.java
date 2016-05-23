@@ -8,15 +8,17 @@ public class ChuvaString implements Serializable {
 
 	private String codigo;
 	
+	private String estacao;
+	
 	private String data;
 	
 	private String hora;
 	
 	private String precipitacao;
 
-	public ChuvaString(String codigo, String data, String hora, String precipitacao) {
+	public ChuvaString(String estacao, String data, String hora, String precipitacao) {
 		super();
-		this.codigo = codigo;
+		this.estacao = estacao;
 		this.data = data;
 		this.hora = hora;
 		this.precipitacao = precipitacao;
@@ -54,6 +56,14 @@ public class ChuvaString implements Serializable {
 		this.precipitacao = precipitacao;
 	}
 
+
+	public String getEstacao() {
+		return estacao;
+	}
+
+	public void setEstacao(String estacao) {
+		this.estacao = estacao;
+	}
 
 	@Override
 	public String toString() {
