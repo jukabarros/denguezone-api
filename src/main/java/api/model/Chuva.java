@@ -1,7 +1,10 @@
 package api.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Chuva implements Serializable {
 
@@ -9,18 +12,18 @@ public class Chuva implements Serializable {
 	
 	private Integer id;
 	
-	private String codigo;
-	
-	private Date data;
+	private String estacao;
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd/MM/yyyy")
+	private Timestamp data;
 	
 	private Integer hora;
 	
 	private double precipitacao;
 
-	public Chuva(Integer id, String codigo, Date data, Integer hora, double precipitacao) {
+	public Chuva(Integer id, String estacao, Timestamp data, Integer hora, double precipitacao) {
 		super();
 		this.id = id;
-		this.codigo = codigo;
+		this.estacao = estacao;
 		this.data = data;
 		this.hora = hora;
 		this.precipitacao = precipitacao;
@@ -39,19 +42,19 @@ public class Chuva implements Serializable {
 		this.id = id;
 	}
 
-	public String getCodigo() {
-		return codigo;
+	public String getEstacao() {
+		return estacao;
 	}
 
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
+	public void setEstacao(String estacao) {
+		this.estacao = estacao;
 	}
 
 	public Date getData() {
 		return data;
 	}
 
-	public void setData(Date data) {
+	public void setData(Timestamp data) {
 		this.data = data;
 	}
 
@@ -73,7 +76,7 @@ public class Chuva implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Chuva [codigo=" + codigo + ", data=" + data + ", precipitacao=" + precipitacao + "]";
+		return "Chuva [codigo=" + estacao + ", data=" + data + ", precipitacao=" + precipitacao + "]";
 	}
 	
 

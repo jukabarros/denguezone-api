@@ -56,6 +56,7 @@ public class DenunciaDAO extends AbstractDAO {
 		ResultSet results = this.queryExec.executeQuery();
 		Denuncia denuncia = new Denuncia();
 		while (results.next()){
+			denuncia.setId(results.getInt("id"));
 			denuncia.setProtocolo(results.getString("protocolo"));
 			denuncia.setBairro(results.getString("bairro"));
 			denuncia.setEndereco(results.getString("endereco"));

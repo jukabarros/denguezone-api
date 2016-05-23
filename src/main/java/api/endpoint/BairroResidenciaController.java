@@ -26,7 +26,7 @@ public class BairroResidenciaController {
 	@Autowired
 	private BairroResidenciaDAO bairroDAO;
 	
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> getBairros(HttpServletRequest request,
 			@RequestParam(value = "name", required = false) String name){
 		List<BairroResidencia> bairros = new ArrayList<BairroResidencia>();
@@ -40,7 +40,7 @@ public class BairroResidenciaController {
 	 	}	 	
 	}
 	
-	@RequestMapping(value = "/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
+	@RequestMapping(value = "/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<?> getBairrosByName(HttpServletRequest request, 
 			@PathVariable String name) {
 	 	try {

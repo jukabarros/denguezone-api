@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import api.model.Chuva;
 import api.model.ChuvaString;
 
 
@@ -80,6 +81,32 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 			System.out.println("Erro na importacao do CSV chuva. Ultimo registro: "+this.insertCount);
 			
 		}
+	}
+	
+	/**
+	 * Consulta um bairro pelo nome.
+	 * @param name nome do bairro
+	 * @return bairro
+	 * @throws SQLException 
+	 */
+	public List<Chuva> findChuvasByYear(int ano) throws SQLException {
+		this.beforeExecuteQuery();
+		this.query = "SELECT * FROM chuvas WHERE YEAR(data) = ? ";
+		this.queryExec = this.connDB.prepareStatement(query);
+		this.queryExec.setInt(1, ano);
+		ResultSet results = this.queryExec.executeQuery();
+		List<Chuva> chuvas = new ArrayList<Chuva>();
+		while (results.next()){
+			Chuva ch = new Chuva(results.getInt("id"),
+					results.getString("estacao"), 
+					results.getTimestamp("data"),
+					results.getInt("hora"), 
+					results.getDouble("precipitacao"));
+			chuvas.add(ch);
+		}
+		results.close();
+		this.afterExecuteQuery();
+		return chuvas;
 	}
 	
 	

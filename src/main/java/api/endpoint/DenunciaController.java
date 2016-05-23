@@ -42,11 +42,11 @@ public class DenunciaController {
 	 	}	 	
 	}
 	
-	@RequestMapping(value = "/{protcolo}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
+	@RequestMapping(value = "/{protocolo}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8")
 	public ResponseEntity<?> getDenunciaByProtocolo(HttpServletRequest request, 
-			@PathVariable String protcolo) {
+			@PathVariable String protocolo) {
 	 	try {
-	 		Denuncia denuncia = this.denunciaDAO.findDenunciaByProtocolo(protcolo);
+	 		Denuncia denuncia = this.denunciaDAO.findDenunciaByProtocolo(protocolo);
 	 		if (denuncia.getId() == null){
 	 			return new ResponseEntity<Error>(new Error(404, "Denuncia não encontrada"), HttpStatus.NOT_FOUND); 
 	 		}
