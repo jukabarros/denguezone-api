@@ -2,14 +2,21 @@ package api.model;
 
 import java.io.Serializable;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value = "Bairro Residência", description = "Modelo que representa um Bairro")
 public class BairroResidencia implements Serializable {
 
 	private static final long serialVersionUID = -506982896668052070L;
 	
+	@ApiModelProperty(value = "Código único identificador do Bairro", required = true)
 	private Integer codigo;
 	
+	@ApiModelProperty(value = "Nome do Bairro", required = true)
 	private String nome;
 	
+	@ApiModelProperty(value = "Município do Bairro", required = false)
 	private String municipio;
 
 	public BairroResidencia() {

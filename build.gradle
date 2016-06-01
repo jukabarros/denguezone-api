@@ -54,6 +54,9 @@ dependencies {
 	
 	// MySQL
 	compile 'mysql:mysql-connector-java:5.1.13'
+	
+	// Swagger
+	compile group: 'com.mangofactory', name: 'swagger-springmvc', version: '1.0.1'
     
 }
 
