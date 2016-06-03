@@ -16,13 +16,13 @@ import api.model.ChuvaString;
 public class ChuvaDAO extends AbstractDAO implements Serializable{
 
 	private static final long serialVersionUID = -3992334995663647691L;
-	
+
 	public int insertCount;
-	
+
 	public ChuvaDAO() {
 		this.insertCount = 0;
 	}
-	
+
 	/**
 	 * Retorna todas as colunas da tabela chuva
 	 * @return list 
@@ -30,12 +30,12 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 	 */
 	public List<String> getAllColumns() throws SQLException{
 		List<String> allColumnsTable = new ArrayList<String>();
-		
+
 		this.beforeExecuteQuery();
 		this.query = "DESC chuvas";
 		this.queryExec = this.connDB.prepareStatement(query);
 		ResultSet results = this.queryExec.executeQuery();
-		
+
 		while (results.next()){
 			String column = results.getString("Field");
 			allColumnsTable.add(column);
@@ -44,7 +44,7 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 		this.afterExecuteQuery();
 		return allColumnsTable;
 	}
-	
+
 	/**
 	 * Insert na tabela principal (com as FKs) do BD. 
 	 * Usado para realizar os testes do parser
@@ -55,15 +55,15 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 		this.queryInsert = "INSERT INTO chuvas"
 				+ " (estacao, data, hora, precipitacao)"
 				+ " VALUES (?,?,?,?);";
-		
+
 		this.queryExecInsert = this.connDB.prepareStatement(this.queryInsert);
-	
+
 	}
-	
+
 	public void insertChuvasRegister(ChuvaString cs) throws SQLException{
 		int index = 0;
 		try{
-			
+
 			this.queryExecInsert.setString(++index, cs.getEstacao());
 			this.queryExecInsert.setString(++index, cs.getData());
 			this.queryExecInsert.setString(++index, cs.getHora());
@@ -79,10 +79,10 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 			}
 		} catch(Exception e) {
 			System.out.println("Erro na importacao do CSV chuva. Ultimo registro: "+this.insertCount);
-			
+
 		}
 	}
-	
+
 	/**
 	 * Consulta um bairro pelo nome.
 	 * @param name nome do bairro
@@ -108,6 +108,39 @@ public class ChuvaDAO extends AbstractDAO implements Serializable{
 		this.afterExecuteQuery();
 		return chuvas;
 	}
-	
-	
+
+	/**
+	 * Consulta um bairro pelo nome.
+	 * @param name nome do bairro
+	 * @return bairro
+	 * @throws SQLException 
+	 */
+	public List<Double> findChuvasByYearGroupByMonth(int ano) throws SQLException {
+		this.beforeExecuteQuery();
+		this.query = "SELECT MONTH(data) as mes, SUM(precipitacao) as quantidade"
+				+ " FROM chuvas WHERE YEAR(data) = ? GROUP BY MONTH(data);";
+		this.queryExec = this.connDB.prepareStatement(query);
+		this.queryExec.setInt(1, ano);
+		ResultSet results = this.queryExec.executeQuery();
+		List<Integer> meses = new ArrayList<Integer>();
+		List<Double> valoresChuvas = new ArrayList<Double>();
+		while (results.next()){
+			meses.add(results.getInt("mes"));
+			valoresChuvas.add(results.getDouble("quantidade"));
+		}
+		results.close();
+		this.afterExecuteQuery();
+
+		// Add valor 0 caso nao apresente nenhuma notificacao em determinado mes
+		if (meses.size() != 12){
+			for (int i = 1; i <= 12; i++) {
+				if (!meses.contains(i)){
+					valoresChuvas.add(i-1, 0.0);
+				}
+			}
+		}
+		return valoresChuvas;
+	}
+
+
 }
