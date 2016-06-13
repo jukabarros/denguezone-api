@@ -1,0 +1,11 @@
+# ------- BETWEEN DATES (TODO: INSERT 0 WHEN NON CASES IN DATE)
+SELECT COUNT(*) AS qntd, dt_notificacao FROM casos_aedes
+WHERE dt_notificacao BETWEEN '2015-01-02' AND '2015-01-22'
+GROUP BY dt_notificacao ORDER BY dt_notificacao ASC;
+
+# --------------- RANKING TOP 10
+SELECT COUNT(*) AS qntd, nome  FROM casos_aedes, bairro_residencia
+WHERE casos_aedes.co_bairro_residencia = bairro_residencia.codigo AND
+dt_notificacao BETWEEN '2015-02-02' AND '2015-02-28' 
+GROUP BY co_bairro_residencia ORDER BY qntd DESC LIMIT 10;
+
