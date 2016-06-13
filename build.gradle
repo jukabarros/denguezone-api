@@ -57,6 +57,10 @@ dependencies {
 	
 	// Swagger
 	compile group: 'com.mangofactory', name: 'swagger-springmvc', version: '1.0.1'
+	
+	// Commons Math Spearman Correlation
+	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
+	
     
 }
 

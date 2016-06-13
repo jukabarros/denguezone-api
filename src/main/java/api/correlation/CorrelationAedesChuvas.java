@@ -1,13 +1,15 @@
-package api.pearson;
+package api.correlation;
 
-public class PearsonCorrelation {
+import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
+
+public class CorrelationAedesChuvas {
 
 	private double mediax;
 	private double mediay;
 	private double[] x;
 	private double[] y;
 
-	public PearsonCorrelation(double[]array1, double[]array2) {
+	public CorrelationAedesChuvas(double[]array1, double[]array2) {
 		this.x = array1;
 		this.y = array2;
 		this.mediax = this.media(array1);
@@ -59,5 +61,15 @@ public class PearsonCorrelation {
 		}
 		coef = covariancia/(varianciax*varianciay);//calculando coeficiente de pearson
 		return coef;
+	}
+	
+	
+	/**
+	 * Calcula a correlacao de spearman
+	 * @return
+	 */
+	public double correlationSpearman(){
+		SpearmansCorrelation s = new SpearmansCorrelation();
+		return s.correlation(this.x, this.y);
 	}
 }
