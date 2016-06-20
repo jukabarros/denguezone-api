@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import api.dao.CasosAedesDAO;
-import api.model.CasosAedesEntreDatas;
 import api.model.Error;
 
 @RestController
@@ -55,13 +55,13 @@ public class CasosAedesController {
 				String dataInicio = df.format(dateInit);
 				String dataFim = df.format(dateEnd);
 				
-				List<CasosAedesEntreDatas> casosEntreDatasBairro = this.casosAedesDAO.getBetweenDateByBairro(
+				Map<String, Integer> casosEntreDatasBairro = this.casosAedesDAO.getCasosBTW2DatesByBairro(
 						codBairro, dataInicio, dataFim);
 				
 				if (casosEntreDatasBairro.isEmpty()) {
 					return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
 				} 
-				return new ResponseEntity<List<CasosAedesEntreDatas>>(casosEntreDatasBairro, HttpStatus.OK);
+				return new ResponseEntity<Map<String, Integer>>(casosEntreDatasBairro, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {

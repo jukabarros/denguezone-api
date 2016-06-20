@@ -3,13 +3,18 @@ package api.dao;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import api.model.CasosAedesEntreDatas;
 import api.model.CasosAedesStrings;
+import api.util.DateUtil;
 
 @Repository("casosAedesDAO")
 public class CasosAedesDAO extends AbstractDAO implements Serializable{
@@ -106,12 +111,13 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 * @param codigoBairro codigo do bairro
 	 * @param ano
 	 * @throws SQLException
+	 * @throws ParseException 
 	 */
-	public List<CasosAedesEntreDatas> getBetweenDateByBairro(Integer codBairro, String dateInit, String dateEnd) throws SQLException {
+	public Map<String, Integer> getCasosBTW2DatesByBairro(Integer codBairro, String dateInit, String dateEnd) throws SQLException, ParseException {
 		this.beforeExecuteQuery();
-		this.query = "SELECT dt_notificacao AS data_notificacao, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
+		this.query = "SELECT DATE(dt_notificacao) AS data_notificacao, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
 				+ " WHERE b.codigo = ca.co_bairro_residencia AND b.codigo = ? AND ca.dt_notificacao BETWEEN ? AND ?"
-				+ " GROUP BY dt_notificacao ORDER BY dt_notificacao;";
+				+ " GROUP BY data_notificacao ORDER BY data_notificacao ASC;";
 		
 		this.queryExec = this.connDB.prepareStatement(this.query);
 		this.queryExec.setInt(1, codBairro);
@@ -119,17 +125,36 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		this.queryExec.setString(3, dateEnd);
 		
 		ResultSet results = this.queryExec.executeQuery();
-		List<CasosAedesEntreDatas> casosDatas = new ArrayList<CasosAedesEntreDatas>();
+		Date casosInit = new SimpleDateFormat("yyyy-MM-dd").parse(dateInit);
+		Date casosEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dateEnd);
+		DateUtil du = new DateUtil();
+		// Recuperando todas as datas do intervalo das datas
+		List<String> allDatesStr = du.getDaysBetweenDates(casosInit, casosEnd);
+		// Criando o mapa inical
+		Map<String, Integer> casosAedesEntreDatas = createMapOfDatesInit(allDatesStr);
+
 		while (results.next()){
-			CasosAedesEntreDatas caed = new CasosAedesEntreDatas(results.getInt("quantidade"),
-					results.getTimestamp("data_notificacao"));
-			casosDatas.add(caed);
+			casosAedesEntreDatas.put(results.getString("data_notificacao"), results.getInt("quantidade"));
 		}
 		results.close();
 		
 		this.afterExecuteQuery();
 		
-		return casosDatas;
+		return casosAedesEntreDatas;
+	}
+	
+	/**
+	 * Cria o MAP inicial, com todas as datas (key)
+	 * e a qntd de casos (value) inicialmente = 0
+	 * @param datesStr
+	 * @return
+	 */
+	private Map<String, Integer> createMapOfDatesInit(List<String> datesStr) {
+		Map<String, Integer> casosAedesEntreDatasInit = new LinkedHashMap<String, Integer>();
+		for (int i = 0; i < datesStr.size(); i++) {
+			casosAedesEntreDatasInit.put(datesStr.get(i), 0);
+		}
+		return casosAedesEntreDatasInit;
 	}
 	
 	/**
