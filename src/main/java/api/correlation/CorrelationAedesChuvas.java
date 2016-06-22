@@ -1,15 +1,17 @@
 package api.correlation;
 
-import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
+import java.text.DecimalFormat;
+import java.util.List;
+
 
 public class CorrelationAedesChuvas {
 
 	private double mediax;
 	private double mediay;
-	private double[] x;
-	private double[] y;
+	private List<Double> x;
+	private List<Double> y;
 
-	public CorrelationAedesChuvas(double[]array1, double[]array2) {
+	public CorrelationAedesChuvas(List<Double> array1, List<Double> array2) {
 		this.x = array1;
 		this.y = array2;
 		this.mediax = this.media(array1);
@@ -21,12 +23,12 @@ public class CorrelationAedesChuvas {
 	 * @param z arranjo
 	 * @return media
 	 */
-	public double media(double[]z) {
+	public double media(List<Double> z) {
 		double media=0;
-		for (int i = 0; i < z.length; i++) {
-			media+=z[i];
+		for (int i = 0; i < z.size(); i++) {
+			media+=z.get(i);
 		}
-		media = media/z.length;
+		media = media/z.size();
 		return media;
 	}
 
@@ -35,11 +37,11 @@ public class CorrelationAedesChuvas {
 	 * @param z
 	 * @return variancia
 	 */
-	public double variancia(double[] z) {
+	public double variancia(List<Double> z) {
 		double mediaz = this.media(z),var=0;
 
-		for (int i = 0; i < z.length; i++) {
-			var += Math.pow((z[i]-mediaz),2);
+		for (int i = 0; i < z.size(); i++) {
+			var += Math.pow((z.get(i)-mediaz),2);
 		}
 		return Math.sqrt(var);
 	}
@@ -54,23 +56,24 @@ public class CorrelationAedesChuvas {
 		double covariancia=0,coef, varianciax = this.variancia(x), 
 				varianciay = this.variancia(y);
 
-		for (int i = 0; i < x.length; i++) {
-			covariancia += (x[i]-mediax)*(y[i]-mediay);
+		for (int i = 0; i < x.size(); i++) {
+			covariancia += (x.get(i)-mediax)*(y.get(i)-mediay);
 		}
-		//calculando coeficiente de pearson
+		//calculando coeficiente de pearson com ate 3 casas decimais
+		DecimalFormat df = new DecimalFormat("#.###");   
 		coef = covariancia/(varianciax*varianciay);
-		return coef;
+		return Double.valueOf(df.format(coef));
 	}
 	
 	
-	/**
-	 * Calcula a correlacao de spearman
-	 * É usada a lib: org.apache.commons.math3
-	 * @return
-	 */
-	public double correlationSpearman(){
-		SpearmansCorrelation s = new SpearmansCorrelation();
-		return s.correlation(this.x, this.y);
-	}
+//	/**
+//	 * Calcula a correlacao de spearman
+//	 * É usada a lib: org.apache.commons.math3
+//	 * @return
+//	 */
+//	public double correlationSpearman(){
+//		SpearmansCorrelation s = new SpearmansCorrelation();
+//		return s.correlation(this.x, this.y);
+//	}
 	
 }

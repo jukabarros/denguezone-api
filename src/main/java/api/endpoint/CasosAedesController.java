@@ -55,13 +55,13 @@ public class CasosAedesController {
 				String dataInicio = df.format(dateInit);
 				String dataFim = df.format(dateEnd);
 				
-				Map<String, Integer> casosEntreDatasBairro = this.casosAedesDAO.getCasosBTW2DatesByBairro(
+				Map<String, Double> casosEntreDatasBairro = this.casosAedesDAO.getCasosBTW2DatesByBairro(
 						codBairro, dataInicio, dataFim);
 				
 				if (casosEntreDatasBairro.isEmpty()) {
 					return new ResponseEntity<Error>(new Error(404, "Dados não encontrados"), HttpStatus.NOT_FOUND); 
 				} 
-				return new ResponseEntity<Map<String, Integer>>(casosEntreDatasBairro, HttpStatus.OK);
+				return new ResponseEntity<Map<String, Double>>(casosEntreDatasBairro, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {

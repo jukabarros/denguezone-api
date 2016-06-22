@@ -113,7 +113,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 * @throws SQLException
 	 * @throws ParseException 
 	 */
-	public Map<String, Integer> getCasosBTW2DatesByBairro(Integer codBairro, String dateInit, String dateEnd) throws SQLException, ParseException {
+	public Map<String, Double> getCasosBTW2DatesByBairro(Integer codBairro, String dateInit, String dateEnd) throws SQLException, ParseException {
 		this.beforeExecuteQuery();
 		this.query = "SELECT DATE(dt_notificacao) AS data_notificacao, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
 				+ " WHERE b.codigo = ca.co_bairro_residencia AND b.codigo = ? AND ca.dt_notificacao BETWEEN ? AND ?"
@@ -131,10 +131,10 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		// Recuperando todas as datas do intervalo das datas
 		List<String> allDatesStr = du.getDaysBetweenDates(casosInit, casosEnd);
 		// Criando o mapa inical
-		Map<String, Integer> casosAedesEntreDatas = createMapOfDatesInit(allDatesStr);
+		Map<String, Double> casosAedesEntreDatas = createMapOfDatesInit(allDatesStr);
 
 		while (results.next()){
-			casosAedesEntreDatas.put(results.getString("data_notificacao"), results.getInt("quantidade"));
+			casosAedesEntreDatas.put(results.getString("data_notificacao"), results.getDouble("quantidade"));
 		}
 		results.close();
 		
@@ -149,10 +149,10 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 * @param datesStr
 	 * @return
 	 */
-	private Map<String, Integer> createMapOfDatesInit(List<String> datesStr) {
-		Map<String, Integer> casosAedesEntreDatasInit = new LinkedHashMap<String, Integer>();
+	private Map<String, Double> createMapOfDatesInit(List<String> datesStr) {
+		Map<String, Double> casosAedesEntreDatasInit = new LinkedHashMap<String, Double>();
 		for (int i = 0; i < datesStr.size(); i++) {
-			casosAedesEntreDatasInit.put(datesStr.get(i), 0);
+			casosAedesEntreDatasInit.put(datesStr.get(i), 0.0);
 		}
 		return casosAedesEntreDatasInit;
 	}
