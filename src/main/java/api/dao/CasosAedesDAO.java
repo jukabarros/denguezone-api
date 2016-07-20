@@ -34,7 +34,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	 * @param ano
 	 * @throws SQLException
 	 */
-	public List<Integer> getValuesByMonthBairro(Integer codigoBairro, Integer ano) throws SQLException {
+	public List<Integer> getValuesByMonthBairro(Integer codigoBairro, Integer mes) throws SQLException {
 		this.beforeExecuteQuery();
 		this.query = "SELECT MONTH(dt_notificacao) AS mes, COUNT(*) AS quantidade FROM casos_aedes ca, bairro_residencia b "
 				+ "WHERE b.codigo = ca.co_bairro_residencia AND b.codigo = ? AND ca.ano_notificacao = ? "
@@ -42,7 +42,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 		
 		this.queryExec = this.connDB.prepareStatement(this.query);
 		this.queryExec.setInt(1, codigoBairro);
-		this.queryExec.setInt(2, ano);
+		this.queryExec.setInt(2, mes);
 		
 		ResultSet results = this.queryExec.executeQuery();
 		List<Integer> valoresGrafico = new ArrayList<Integer>();
@@ -67,7 +67,7 @@ public class CasosAedesDAO extends AbstractDAO implements Serializable{
 	}
 	
 	/**
-	 * Recupera o numero de casos por mes de um determinado
+	 * Recupera o numero de casos agrupados por mes de um determinado
 	 * bairro em um determinado ano
 	 * @param codigoBairro codigo do bairro
 	 * @param ano
